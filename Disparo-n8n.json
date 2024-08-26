@@ -1,0 +1,434 @@
+{
+  "name": "DISPARO",
+  "nodes": [
+    {
+      "parameters": {
+        "amount": "={{ Math.floor(Math.random() * (60 - 40 + 1)) + 40 }}\n",
+        "unit": "seconds"
+      },
+      "id": "04e02c69-1710-49fb-922d-088c199467c7",
+      "name": "Wait",
+      "type": "n8n-nodes-base.wait",
+      "typeVersion": 1,
+      "position": [
+        -40,
+        1060
+      ],
+      "webhookId": "5b324f7c-89fa-4770-a8e4-02fccf078f32"
+    },
+    {
+      "parameters": {
+        "batchSize": 1,
+        "options": {
+          "reset": false
+        }
+      },
+      "id": "0daf9063-7e0a-4be6-b2bc-6152d5c5c1c0",
+      "name": "Split In Batches2",
+      "type": "n8n-nodes-base.splitInBatches",
+      "typeVersion": 2,
+      "position": [
+        -460,
+        1100
+      ]
+    },
+    {
+      "parameters": {
+        "values": {
+          "string": [
+            {
+              "name": "=novodados",
+              "value": "={{ $('Google Sheets - Config').item.json.numeros }}"
+            },
+            {
+              "name": "apikey",
+              "value": "={{ $('Webhook1').item.json.body.apikey }}"
+            },
+            {
+              "name": "urlapi",
+              "value": "={{ $('Webhook1').item.json.body.urlapi }}"
+            },
+            {
+              "name": "tipodeenvio",
+              "value": "={{ $('Webhook1').item.json.body.tipodeenvio }}"
+            },
+            {
+              "name": "estancia",
+              "value": "={{ $('Webhook1').item.json.body.estancia }}"
+            },
+            {
+              "name": "tipodearquivo",
+              "value": "="
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "bf29aaff-ba70-489f-a8a8-38f3fab1e63f",
+      "name": "Info Base",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 1,
+      "position": [
+        -1300,
+        1240
+      ]
+    },
+    {
+      "parameters": {
+        "fieldToSplitOut": "novodados",
+        "options": {}
+      },
+      "id": "ec9ab09f-43a6-492b-a558-c08cc235f9c8",
+      "name": "Item Lists",
+      "type": "n8n-nodes-base.itemLists",
+      "typeVersion": 3,
+      "position": [
+        -660,
+        1100
+      ]
+    },
+    {
+      "parameters": {
+        "amount": "={{ Math.floor(Math.random() * (60 - 40 + 1)) + 40 }}\n",
+        "unit": "seconds"
+      },
+      "id": "c5880a77-726a-465e-8cff-35d00cf6b489",
+      "name": "Wait1",
+      "type": "n8n-nodes-base.wait",
+      "typeVersion": 1,
+      "position": [
+        -40,
+        1340
+      ],
+      "webhookId": "5b324f7c-89fa-4770-a8e4-02fccf078f32"
+    },
+    {
+      "parameters": {
+        "batchSize": 1,
+        "options": {
+          "reset": false
+        }
+      },
+      "id": "bef4b4ef-47a2-455a-ae22-5079b376f10e",
+      "name": "Split In Batches",
+      "type": "n8n-nodes-base.splitInBatches",
+      "typeVersion": 2,
+      "position": [
+        -440,
+        1360
+      ]
+    },
+    {
+      "parameters": {
+        "fieldToSplitOut": "novodados",
+        "options": {}
+      },
+      "id": "e0e582ba-6223-4731-a8b5-70c690e9808a",
+      "name": "Item Lists1",
+      "type": "n8n-nodes-base.itemLists",
+      "typeVersion": 3,
+      "position": [
+        -680,
+        1360
+      ]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $('Info Base').item.json[\"urlapi\"] }}/message/sendMedia/{{ $('Info Base').item.json[\"estancia\"] }}",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "apikey",
+              "value": "={{ $('Info Base').item.json[\"apikey\"] }}"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n    \"number\": \"{{ $('Split In Batches').item.json[\"novodados\"] }}\",\n    \"options\": {\n        \"delay\": 1200,\n        \"presence\": \"composing\"\n    },\n    \"mediaMessage\": {\n        \"mediatype\": \"{{ $('Webhook1').item.json[\"body\"][\"tipodearquivo\"] }}\",\n        \"caption\": \"{{ $('Webhook1').item.json[\"body\"][\"mensgaem\"] }}\",\n        \"media\": \"{{ $('Webhook1').item.json[\"body\"][\"arquivo\"] }}\"\n    }\n}",
+        "options": {}
+      },
+      "id": "882136df-b503-458f-aecd-e864e7d68228",
+      "name": "envio media",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 3,
+      "position": [
+        -240,
+        1340
+      ],
+      "continueOnFail": true
+    },
+    {
+      "parameters": {
+        "dataType": "string",
+        "value1": "={{ $json.tipodeenvio }}",
+        "rules": {
+          "rules": [
+            {
+              "value2": "texto"
+            },
+            {
+              "value2": "media",
+              "output": 1
+            }
+          ]
+        }
+      },
+      "id": "82be9719-cf4e-441d-a3b0-8c5742e9fc35",
+      "name": "Switch",
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 1,
+      "position": [
+        -1000,
+        1240
+      ]
+    },
+    {
+      "parameters": {
+        "authentication": "serviceAccount",
+        "documentId": {
+          "__rl": true,
+          "value": "https://docs.google.com/spreadsheets/d/1VvWrESpz-jEsKB6nNYY7z-rflRYqatoYRY5Q8FK0lrI/edit?usp=sharing",
+          "mode": "url"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Página1",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1VvWrESpz-jEsKB6nNYY7z-rflRYqatoYRY5Q8FK0lrI/edit#gid=0"
+        },
+        "options": {}
+      },
+      "id": "f021a87f-ea78-4d0a-84db-65d04b18b9b6",
+      "name": "Google Sheets - Config",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.4,
+      "position": [
+        -1660,
+        1240
+      ],
+      "credentials": {
+        "googleApi": {
+          "id": "OF5H8J0ZZaK7QZvg",
+          "name": "Google Sheets account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "content": "## Informações base\n\nTutorial base\nhttps://astraonline.com.br/disparo-de-whatsapp-em-massa-typebot-n8n/\nhttps://www.youtube.com/watch?v=YIjDWbpnrxE\n\n\nTutorial alternativo\nhttps://www.youtube.com/watch?v=S64NC60lb8g",
+        "height": 370.56976744186056,
+        "width": 505.59302325581405,
+        "color": 5
+      },
+      "id": "f87a75ba-fdf7-4069-bb6c-1b4fe36169d3",
+      "name": "Sticky Note",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -1940,
+        1620
+      ]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $('Google Sheets - Config').item.json.urlapi }}/message/sendText/{{ $('Google Sheets - Config').item.json.instancia }}",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "apikey",
+              "value": "={{ $('Info Base').item.json[\"apikey\"] }}"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n    \"number\": \"{{ $('Split In Batches2').item.json[\"novodados\"] }}\",\n    \"options\": {\n        \"delay\": 1200,\n        \"presence\": \"composing\",\n        \"linkPreview\": false\n    },\n    \"textMessage\": {\n        \"text\": \"{{ $('Webhook1').item.json[\"body\"][\"mensgaem\"] }}\"\n    }\n} ",
+        "options": {}
+      },
+      "id": "daaecd2b-d4b2-4a79-a4bb-c93bc0893c96",
+      "name": "Envio texto 1",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 3,
+      "position": [
+        -240,
+        1060
+      ],
+      "continueOnFail": true
+    },
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "disparoemmassatrypebott",
+        "options": {}
+      },
+      "id": "441f3d97-b53c-44bb-aaff-ce985c947343",
+      "name": "Webhook1",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 1,
+      "position": [
+        -1980,
+        1260
+      ],
+      "webhookId": "5792f53c-e5ec-4b43-ab55-d0bc5d627839"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Wait": {
+      "main": [
+        [
+          {
+            "node": "Split In Batches2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Split In Batches2": {
+      "main": [
+        [
+          {
+            "node": "Envio texto 1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Info Base": {
+      "main": [
+        [
+          {
+            "node": "Switch",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Item Lists": {
+      "main": [
+        [
+          {
+            "node": "Split In Batches2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Wait1": {
+      "main": [
+        [
+          {
+            "node": "Split In Batches",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Split In Batches": {
+      "main": [
+        [
+          {
+            "node": "envio media",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Item Lists1": {
+      "main": [
+        [
+          {
+            "node": "Split In Batches",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "envio media": {
+      "main": [
+        [
+          {
+            "node": "Wait1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Switch": {
+      "main": [
+        [
+          {
+            "node": "Item Lists",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Item Lists1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Sheets - Config": {
+      "main": [
+        [
+          {
+            "node": "Info Base",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Envio texto 1": {
+      "main": [
+        [
+          {
+            "node": "Wait",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Webhook1": {
+      "main": [
+        [
+          {
+            "node": "Google Sheets - Config",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "aec10a69-b7bc-4309-b6c8-c07101182a1c",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "dc53a1caa755ed654ddfef92d0aa3f15304c705162f664075f07e16c19813cb2"
+  },
+  "id": "BeAxQGE9AnHOXKOb",
+  "tags": []
+}
